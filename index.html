@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeAItify — AI Content Humanizer</title>
+<style>
+:root {
+  --primary: #4f46e5;
+  --primary-dark: #4338ca;
+  --accent: #10b981;
+  --bg: #ffffff;
+  --bg-light: #f9fafb;
+  --text: #111827;
+  --text-light: #6b7280;
+  --border: #e5e7eb;
+  --shadow: 0 4px 24px rgba(0,0,0,0.06);
+  --radius: 12px;
+  --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+
+.nav-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  height: 60px;
+}
+
+.nav-brand {
+  font-weight: 800;
+  font-size: 18px;
+  color: var(--primary);
+  text-decoration: none;
+  margin-right: auto;
+  letter-spacing: -0.5px;
+}
+
+.nav-tabs {
+  display: flex;
+  gap: 4px;
+}
+
+.nav-tab {
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: var(--text-light);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.nav-tab:hover { background: var(--bg-light); color: var(--text); }
+.nav-tab.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+.nav-cta {
+  margin-left: 16px;
+  padding: 7px 16px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+.nav-cta:hover { background: var(--primary-dark); }
+
+/* ===== HERO ===== */
+.hero {
+  text-align: center;
+  padding: 56px 24px 40px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  line-height: 1.15;
+  margin-bottom: 14px;
+}
+
+.hero h1 .accent { color: var(--primary); }
+
+.hero p {
+  font-size: 18px;
+  color: var(--text-light);
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+
+.lang-tags {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.lang-tag {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--primary);
+  background: rgba(79,70,229,0.08);
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+/* ===== MAIN TOOL ===== */
+.tool-container {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 24px 64px;
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* input panel */
+.input-panel {
+  background: var(--bg-light);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 16px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.input-panel:focus-within {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.1);
+}
+
+#mainInput {
+  width: 100%;
+  min-height: 160px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: var(--font);
+  resize: vertical;
+  outline: none;
+  line-height: 1.65;
+  color: var(--text);
+  background: #fff;
+}
+
+#mainInput::placeholder { color: #9ca3af; }
+
+.input-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.char-count {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+.usage-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.usage-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.usage-dot.used { background: var(--accent); }
+.usage-dot.exhausted { background: #f87171; }
+
+/* action buttons */
+.action-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) { background: var(--primary-dark); }
+.btn-primary:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: var(--bg-light);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+}
+
+.btn-secondary:hover { background: var(--border); }
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+/* spinner */
+.spinner {
+  display: none;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.btn.loading .spinner { display: inline-block; }
+.btn.loading .btn-text { opacity: 0.7; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* output panel */
+.output-panel {
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 20px 16px;
+  position: relative;
+  min-height: 120px;
+}
+
+.output-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-light);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+#outputArea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: var(--font);
+  resize: vertical;
+  outline: none;
+  line-height: 1.65;
+  background: var(--bg-light);
+  color: var(--text);
+}
+
+#outputArea:focus { border-color: var(--primary); }
+
+.output-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+/* demo section */
+.demo-section {
+  margin: 40px 0;
+  padding: 24px;
+  background: var(--bg-light);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.demo-section h3 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.demo-bar-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-light);
+  margin-bottom: 6px;
+  letter-spacing: 0.5px;
+}
+
+.demo-bars { margin-bottom: 16px; }
+
+.demo-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.demo-bar-label-mini {
+  font-size: 11px;
+  color: var(--text-light);
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.demo-bar-track {
+  flex: 1;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.demo-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: var(--primary);
+  transition: width 1s ease;
+}
+
+.demo-bar-fill.human { background: var(--accent); }
+
+.demo-text {
+  font-size: 13px;
+  color: var(--text-light);
+  line-height: 1.7;
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  margin-top: 8px;
+}
+
+/* product highlight */
+.product-highlight {
+  background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  border: 1.5px solid #6b728020;
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 32px 0;
+  flex-wrap: wrap;
+}
+
+.product-highlight-text h4 {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.product-highlight-text p {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+.btn-coming {
+  padding: 9px 20px;
+  background: #d1d5db;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* ai disclosure */
+.ai-disclosure {
+  font-size: 11px;
+  color: var(--text-light);
+  text-align: center;
+  padding: 10px 0 0;
+  opacity: 0.7;
+}
+
+/* ===== FOOTER ===== */
+.site-footer {
+  background: var(--bg-light);
+  border-top: 1px solid var(--border);
+  padding: 32px 24px;
+  text-align: center;
+}
+
+.footer-inner {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.footer-email {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  text-decoration: none;
+  margin-bottom: 16px;
+  display: inline-block;
+}
+
+.footer-email:hover { color: var(--primary); }
+
+.footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.footer-link {
+  font-size: 13px;
+  color: var(--text-light);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.footer-link:hover { color: var(--primary); }
+
+.footer-copy {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+/* ===== COOKIE CONSENT ===== */
+#cookieConsent {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 9999;
+  background: #fff;
+  border-top: 1px solid var(--border);
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.08);
+  padding: 16px 24px;
+  display: none;
+}
+
+#cookieConsent.show { display: block; }
+
+.cookie-inner {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.cookie-text {
+  font-size: 13px;
+  color: var(--text);
+  flex: 1;
+  min-width: 240px;
+}
+
+.cookie-text a {
+  color: var(--primary);
+  text-decoration: underline;
+}
+
+.cookie-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-cookie {
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-cookie-accept {
+  background: var(--primary);
+  color: #fff;
+}
+
+.btn-cookie-accept:hover { background: var(--primary-dark); }
+
+.btn-cookie-reject {
+  background: var(--bg-light);
+  color: var(--text);
+  border: 1.5px solid var(--border);
+}
+
+.btn-cookie-reject:hover { background: var(--border); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 600px) {
+  .hero h1 { font-size: 26px; }
+  .nav-tabs { gap: 2px; }
+  .nav-tab { padding: 5px 10px; font-size: 13px; }
+  .action-row { gap: 8px; }
+  .btn { padding: 9px 16px; font-size: 13px; }
+  .product-highlight { flex-direction: column; align-items: flex-start; }
+}
+
+/* section visibility per tab */
+#section-paper,
+#section-general,
+#section-prompt,
+#section-detect {
+  display: none;
+}
+
+#section-paper.active,
+#section-general.active,
+#section-prompt.active,
+#section-detect.active {
+  display: block;
+}
+</style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="/" class="nav-brand">DeAItify</a>
+    <div class="nav-tabs" id="navTabs">
+      <button class="nav-tab active" data-tab="paper">Paper</button>
+      <button class="nav-tab" data-tab="general">General</button>
+      <button class="nav-tab" data-tab="prompt">Prompt</button>
+      <button class="nav-tab" data-tab="detect">AI Check</button>
+    </div>
+    <a href="/products.html" class="nav-cta">Pricing</a>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section class="hero">
+  <h1>Make AI Text <span class="accent">Sound Human</span></h1>
+  <p>Paste your AI-generated content below. DeAItify rewrites it to bypass AI detectors — without changing your meaning. Free to try.</p>
+  <div class="lang-tags">
+    <span class="lang-tag">ES</span>
+    <span class="lang-tag">FR</span>
+    <span class="lang-tag">DE</span>
+    <span class="lang-tag">ZH</span>
+    <span class="lang-tag">JA</span>
+    <span class="lang-tag">KO</span>
+  </div>
+</section>
+
+<!-- ===== MAIN TOOL ===== -->
+<main class="tool-container">
+
+  <!-- Paper tab -->
+  <div class="tab-content active" id="section-paper">
+    <div class="input-panel">
+      <textarea id="mainInput" placeholder="Paste your AI-generated paper content here..."></textarea>
+      <div class="input-footer">
+        <span class="char-count" id="charCount">0 / 3,000 chars</span>
+        <div class="usage-dots" id="usageDots"></div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn btn-primary" id="btnHumanize" onclick="handleHumanize()">
+        <span class="spinner"></span>
+        <span class="btn-text">Humanize Text</span>
+      </button>
+      <button class="btn btn-secondary" onclick="handleCopyMain()">Copy Result</button>
+      <button class="btn btn-secondary" onclick="handleClearMain()">Clear</button>
+    </div>
+
+    <div class="output-panel">
+      <div class="output-label">Rewritten Output</div>
+      <textarea id="outputPaper" placeholder="Your humanized text will appear here..."></textarea>
+      <div class="output-actions">
+        <button class="btn btn-sm btn-secondary" onclick="handleCopyPaper()">Copy</button>
+      </div>
+    </div>
+
+    <p class="ai-disclosure">AI-Powered · Results may be reviewed for accuracy</p>
+
+    <div class="product-highlight">
+      <div class="product-highlight-text">
+        <h4>Want unlimited rewrites?</h4>
+        <p>Upgrade to Pro — 2,000 chars per use, unlimited daily</p>
+      </div>
+      <button class="btn-coming">Coming Soon</button>
+    </div>
+
+    <!-- Live Demo -->
+    <div class="demo-section">
+      <h3>How It Works</h3>
+      <div class="demo-bar-label">AI-detection score after rewriting</div>
+      <div class="demo-bars">
+        <div class="demo-bar-row">
+          <span class="demo-bar-label-mini">Before</span>
+          <div class="demo-bar-track"><div class="demo-bar-fill" id="demoBarBefore" style="width:78%"></div></div>
+        </div>
+        <div class="demo-bar-row">
+          <span class="demo-bar-label-mini">After</span>
+          <div class="demo-bar-track"><div class="demo-bar-fill human" id="demoBarAfter" style="width:15%"></div></div>
+        </div>
+      </div>
+      <div class="demo-text" id="demoText">
+        Paste your content above and click Humanize Text — the bar above will update to show your new detection score.
+      </div>
+    </div>
+  </div>
+
+  <!-- General tab -->
+  <div class="tab-content" id="section-general">
+    <div class="input-panel">
+      <textarea id="genInput" placeholder="Paste any AI-generated content here (emails, articles, messages)..."></textarea>
+      <div class="input-footer">
+        <span class="char-count" id="genCharCount">0 / 3,000 chars</span>
+        <div class="usage-dots" id="genUsageDots"></div>
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="btn btn-primary" id="btnGenRewrite" onclick="handleGeneralRewrite()">
+        <span class="spinner"></span>
+        <span class="btn-text">Rewrite</span>
+      </button>
+      <button class="btn btn-secondary" onclick="handleClearGen()">Clear</button>
+    </div>
+    <div class="output-panel">
+      <div class="output-label">Rewritten Output</div>
+      <textarea id="genOutput" placeholder="Your rewritten content will appear here..."></textarea>
+      <div class="output-actions">
+        <button class="btn btn-sm btn-secondary" onclick="handleCopyGen()">Copy</button>
+      </div>
+    </div>
+    <p class="ai-disclosure">AI-Powered · Results may be reviewed for accuracy</p>
+  </div>
+
+  <!-- Prompt tab -->
+  <div class="tab-content" id="section-prompt">
+    <div class="input-panel">
+      <textarea id="promptInput" placeholder="Paste your AI prompt here to make it less robotic and more natural..."></textarea>
+      <div class="input-footer">
+        <span class="char-count" id="promptCharCount">0 / 3,000 chars</span>
+        <div class="usage-dots" id="promptUsageDots"></div>
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="btn btn-primary" id="btnDeprompt" onclick="handleDeprompt()">
+        <span class="spinner"></span>
+        <span class="btn-text">Deprompt</span>
+      </button>
+      <button class="btn btn-secondary" onclick="handleClearPrompt()">Clear</button>
+    </div>
+    <div class="output-panel">
+      <div class="output-label">Deprompted Output</div>
+      <textarea id="promptOutput" placeholder="Your deprompted prompt will appear here..."></textarea>
+      <div class="output-actions">
+        <button class="btn btn-sm btn-secondary" onclick="handleCopyPrompt()">Copy</button>
+      </div>
+    </div>
+    <p class="ai-disclosure">AI-Powered · Results may be reviewed for accuracy</p>
+  </div>
+
+  <!-- AI Check tab -->
+  <div class="tab-content" id="section-detect">
+    <div class="input-panel">
+      <textarea id="detectInput" placeholder="Paste text to check its AI-detection score..."></textarea>
+      <div class="input-footer">
+        <span class="char-count" id="detectCharCount">0 / 3,000 chars</span>
+        <div class="usage-dots" id="detectUsageDots"></div>
+      </div>
+    </div>
+    <div class="action-row">
+      <button class="btn btn-primary" id="btnDetect" onclick="handleDetect()">
+        <span class="spinner"></span>
+        <span class="btn-text">Analyze</span>
+      </button>
+      <button class="btn btn-secondary" onclick="handleClearDetect()">Clear</button>
+    </div>
+    <div class="output-panel">
+      <div class="output-label">Detection Result</div>
+      <textarea id="detectOutput" placeholder="AI detection score will appear here..."></textarea>
+    </div>
+    <p class="ai-disclosure">AI detection is an estimate — for official reports, contact <a href="mailto:l15149134554@gmail.com">l15149134554@gmail.com</a></p>
+  </div>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a href="mailto:l15149134554@gmail.com" class="footer-email">l15149134554@gmail.com</a>
+    <div class="footer-links">
+      <a href="/products.html" class="footer-link">Pricing</a>
+      <a href="/privacy.html" class="footer-link">Privacy</a>
+      <a href="/terms.html" class="footer-link">Terms</a>
+      <a href="#" class="footer-link" onclick="doPaidNotify(); return false;">I Want to Pay</a>
+    </div>
+    <p class="footer-copy">AI-Powered Transparency: This tool uses AI to analyze and rewrite content. DeAItify &copy; 2026</p>
+  </div>
+</footer>
+
+<!-- ===== COOKIE CONSENT ===== -->
+<div id="cookieConsent">
+  <div class="cookie-inner">
+    <p class="cookie-text">
+      We use cookies to improve your experience. By continuing, you agree to our <a href="/privacy.html">Privacy Policy</a>.
+    </p>
+    <div class="cookie-actions">
+      <button class="btn-cookie btn-cookie-accept" onclick="acceptCookies()">Accept</button>
+      <button class="btn-cookie btn-cookie-reject" onclick="rejectCookies()">Refuse</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== API CLIENT ===== -->
+<script src="api.js"></script>
+
+<!-- ===== APP LOGIC ===== -->
+<script>
+// === Usage Management ===
+const I18N = {
+  charsPerUse: '3,000 chars/use',
+  dailyLabel: 'Free trial: 3 uses/day · Pro: 2,000 chars/use',
+};
+
+let usageCount = 3;
+let dailyDate = '';
+
+function getStored(key, fallback) {
+  try {
+    const v = localStorage.getItem(key);
+    return v !== null ? v : fallback;
+  } catch { return fallback; }
+}
+
+function getStoredNum(key, fallback) {
+  try {
+    const v = localStorage.getItem(key);
+    return v !== null ? parseInt(v, 10) : fallback;
+  } catch { return fallback; }
+}
+
+function safeStore(key, value) {
+  try { localStorage.setItem(key, value); } catch {}
+}
+
+function initFirstVisit() {
+  const consent = getStored('cookie_consent', '');
+  if (!consent) {
+    setTimeout(() => {
+      const el = document.getElementById('cookieConsent');
+      if (el) el.classList.add('show');
+    }, 800);
+  }
+}
+
+function acceptCookies() {
+  safeStore('cookie_consent', 'accepted');
+  document.getElementById('cookieConsent').classList.remove('show');
+  track('Cookie', 'Accepted');
+}
+
+function rejectCookies() {
+  safeStore('cookie_consent', 'rejected');
+  document.getElementById('cookieConsent').classList.remove('show');
+  track('Cookie', 'Rejected');
+}
+
+function getCookieConsent() {
+  return getStored('cookie_consent', '');
+}
+
+function consumeUsage() {
+  if (usageCount <= 0) {
+    showToast('No uses left — upgrade to Pro', 'error');
+    return false;
+  }
+  usageCount--;
+  safeStore('deai_count', usageCount);
+  renderUsageDots();
+  return true;
+}
+
+function renderUsageDots() {
+  const dots = ['paper', 'gen', 'prompt', 'detect'].map(id => {
+    const el = document.getElementById(id + 'UsageDots');
+    if (!el) return '';
+    const n = Math.min(usageCount, 3);
+    let html = '';
+    for (let i = 0; i < 3; i++) {
+      html += '<div class="usage-dot' + (i < n ? ' used' : '') + '"></div>';
+    }
+    el.innerHTML = html;
+    return '';
+  });
+  // Update all dot containers
+  ['usageDots', 'genUsageDots', 'promptUsageDots', 'detectUsageDots'].forEach(cid => {
+    const el = document.getElementById(cid);
+    if (!el) return;
+    const n = Math.min(usageCount, 3);
+    let html = '';
+    for (let i = 0; i < 3; i++) {
+      html += '<div class="usage-dot' + (i < n ? ' used' : '') + '"></div>';
+    }
+    el.innerHTML = html;
+  });
+}
+
+// === Navigation ===
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const target = tab.dataset.tab;
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    const section = document.getElementById('section-' + target);
+    if (section) section.classList.add('active');
+    track('Tab switch', target);
+  });
+});
+
+// === Character Counters ===
+function updateCharCount(inputId, countId) {
+  const input = document.getElementById(inputId);
+  const counter = document.getElementById(countId);
+  if (!input || !counter) return;
+  input.addEventListener('input', () => {
+    counter.textContent = input.value.length.toLocaleString() + ' / 3,000 chars';
+  });
+}
+
+updateCharCount('mainInput', 'charCount');
+updateCharCount('genInput', 'genCharCount');
+updateCharCount('promptInput', 'promptCharCount');
+updateCharCount('detectInput', 'detectCharCount');
+
+// === Button Loading State ===
+function setLoading(btnId, loading) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (loading) {
+    btn.classList.add('loading');
+    btn.disabled = true;
+  } else {
+    btn.classList.remove('loading');
+    btn.disabled = false;
+  }
+}
+
+// === Toast ===
+function showToast(message, type) {
+  const existing = document.getElementById('toastMsg');
+  if (existing) existing.remove();
+  const t = document.createElement('div');
+  t.id = 'toastMsg';
+  t.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:9999;transition:opacity 0.3s;opacity:1';
+  t.textContent = message;
+  document.body.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; setTimeout(() => t.remove(), 300); }, 2500);
+}
+
+// === Track / Analytics ===
+window.dataLayer = window.dataLayer || [];
+function track(event, category) {
+  try {
+    if (typeof gtag !== 'undefined') {
+      gtag('event', event, { category: category });
+    }
+    console.log('[DeAItify] Track:', event, category);
+  } catch {}
+}
+
+function trackEvent(event) {
+  try {
+    if (typeof gtag !== 'undefined') {
+      gtag('event', event, {});
+    }
+  } catch {}
+}
+
+// === API Call Wrapper ===
+async function apiCall(endpoint, payload) {
+  const res = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ error: 'Request failed' }));
+    throw new Error(err.error || 'Server error');
+  }
+  return res.json();
+}
+
+// === Humanize Text (Paper tab) ===
+async function handleHumanize() {
+  const input = document.getElementById('mainInput').value.trim();
+  if (!input) { showToast('Please enter some text first', 'error'); return; }
+  if (!consumeUsage()) return;
+  setLoading('btnHumanize', true);
+  track('Click', 'Humanize');
+  try {
+    const data = await apiCall('/api/humanize', { text: input, style: 'humanize' });
+    document.getElementById('outputPaper').value = data.result || data.text || '';
+    track('Done', 'Humanize');
+  } catch (e) {
+    showToast(e.message || 'Humanize failed — please try again', 'error');
+  } finally {
+    setLoading('btnHumanize', false);
+  }
+}
+
+// === General Rewrite ===
+async function handleGeneralRewrite() {
+  const input = document.getElementById('genInput').value.trim();
+  if (!input) { showToast('Please enter some text first', 'error'); return; }
+  if (!consumeUsage()) return;
+  setLoading('btnGenRewrite', true);
+  track('Click', 'General Rewrite');
+  try {
+    const data = await apiCall('/api/rewrite', { text: input, style: 'general' });
+    document.getElementById('genOutput').value = data.result || data.text || '';
+    track('Done', 'General Rewrite');
+  } catch (e) {
+    showToast(e.message || 'Rewrite failed — please try again', 'error');
+  } finally {
+    setLoading('btnGenRewrite', false);
+  }
+}
+
+// === Deprompt ===
+async function handleDeprompt() {
+  const input = document.getElementById('promptInput').value.trim();
+  if (!input) { showToast('Please enter some text first', 'error'); return; }
+  if (!consumeUsage()) return;
+  setLoading('btnDeprompt', true);
+  track('Click', 'Deprompt');
+  try {
+    const data = await apiCall('/api/deprompt', { text: input });
+    document.getElementById('promptOutput').value = data.result || data.text || '';
+    track('Done', 'Deprompt');
+  } catch (e) {
+    showToast(e.message || 'Deprompt failed — please try again', 'error');
+  } finally {
+    setLoading('btnDeprompt', false);
+  }
+}
+
+// === AI Detect ===
+async function handleDetect() {
+  const input = document.getElementById('detectInput').value.trim();
+  if (!input) { showToast('Please enter some text first', 'error'); return; }
+  if (!consumeUsage()) return;
+  setLoading('btnDetect', true);
+  track('Click', 'AI Detect');
+  try {
+    const data = await apiCall('/api/detect', { text: input });
+    const score = data.score !== undefined ? data.score + '% AI-detected' : (data.result || JSON.stringify(data));
+    document.getElementById('detectOutput').value = score;
+    track('Done', 'AI Detect');
+  } catch (e) {
+    showToast(e.message || 'Detection failed — please try again', 'error');
+  } finally {
+    setLoading('btnDetect', false);
+  }
+}
+
+// === Copy Handlers ===
+function handleCopyMain() {
+  const text = document.getElementById('outputPaper').value;
+  if (!text) { showToast('Nothing to copy yet', 'error'); return; }
+  navigator.clipboard.writeText(text).then(() => showToast('Copied!', 'success')).catch(() => {
+    const ta = document.getElementById('outputPaper');
+    ta.select(); document.execCommand('copy'); showToast('Copied!', 'success');
+  });
+}
+
+function handleCopyPaper() { handleCopyMain(); }
+
+function handleCopyGen() {
+  const text = document.getElementById('genOutput').value;
+  if (!text) { showToast('Nothing to copy yet', 'error'); return; }
+  navigator.clipboard.writeText(text).then(() => showToast('Copied!', 'success')).catch(() => {
+    const ta = document.getElementById('genOutput'); ta.select(); document.execCommand('copy'); showToast('Copied!', 'success');
+  });
+}
+
+function handleCopyPrompt() {
+  const text = document.getElementById('promptOutput').value;
+  if (!text) { showToast('Nothing to copy yet', 'error'); return; }
+  navigator.clipboard.writeText(text).then(() => showToast('Copied!', 'success')).catch(() => {
+    const ta = document.getElementById('promptOutput'); ta.select(); document.execCommand('copy'); showToast('Copied!', 'success');
+  });
+}
+
+// === Clear Handlers ===
+function handleClearMain() {
+  document.getElementById('mainInput').value = '';
+  document.getElementById('outputPaper').value = '';
+  track('Clear', 'Paper');
+}
+
+function handleClearGen() {
+  document.getElementById('genInput').value = '';
+  document.getElementById('genOutput').value = '';
+  track('Clear', 'General');
+}
+
+function handleClearPrompt() {
+  document.getElementById('promptInput').value = '';
+  document.getElementById('promptOutput').value = '';
+  track('Clear', 'Prompt');
+}
+
+function handleClearDetect() {
+  document.getElementById('detectInput').value = '';
+  document.getElementById('detectOutput').value = '';
+  track('Clear', 'Detect');
+}
+
+// === I Want to Pay ===
+function doPaidNotify() {
+  const email = prompt('Enter your email to be notified when payment is available:');
+  if (!email) return;
+  const list = JSON.parse(getStored('paid_waiting_list', '[]'));
+  if (!list.includes(email)) { list.push(email); safeStore('paid_waiting_list', JSON.stringify(list)); }
+  showToast('You will be notified — thank you!', 'success');
+  trackEvent('I Want to Pay clicked');
+}
+
+// === GA4 ===
+(function() {
+  var s1 = document.createElement('script');
+  s1.async = true;
+  s1.src = 'https://www.googletagmanager.com/gtag/js?id=G-RPNSC7KS1D';
+  document.head.appendChild(s1);
+  window.dataLayer = window.dataLayer || [];
+  function gtag() { dataLayer.push(arguments); }
+  gtag('js', new Date());
+  gtag('config', 'G-RPNSC7KS1D');
+})();
+
+// === Init ===
+usageCount = getStoredNum('deai_count', 3);
+dailyDate = getStored('daily_date', '');
+const today = new Date().toDateString();
+if (dailyDate !== today) {
+  usageCount = 3;
+  safeStore('deai_count', 3);
+  safeStore('daily_date', today);
+}
+renderUsageDots();
+initFirstVisit();
+</script>
+</body>
+</html>
