@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /stats.html
+Disallow: /promo/
+Sitemap: https://laolang.fun/sitemap.xml
