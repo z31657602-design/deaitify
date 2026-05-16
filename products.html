@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DeAItify — Products & Pricing</title>
+<meta name="description" content="DeAItify products: Academic Paper Humanizer, Multi-Style Rewriting, Prompt Deprompter, AI Content Detector. Simple, transparent pricing.">
+<style>
+:root{--primary:#4F46E5;--primary-dark:#4338CA;--accent:#F97316;--bg:#F8FAFC;--surface:#fff;--text:#1E293B;--text-light:#64748B;--border:#E2E8F0;--radius:12px;--shadow:0 4px 16px rgba(79,70,229,0.12)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
+a{text-decoration:none;color:inherit}
+.navbar{display:flex;align-items:center;justify-content:space-between;padding:16px 32px;background:var(--surface);border-bottom:1px solid var(--border)}
+.navbar .logo{font-size:18px;font-weight:800;color:var(--primary)}
+.nav-tabs{display:flex;gap:4px}
+.nav-tab{padding:8px 16px;border-radius:8px;font-size:14px;color:var(--text-light);transition:all .2s;cursor:pointer}
+.nav-tab:hover{background:var(--bg);color:var(--text)}
+.nav-tab.active{background:var(--primary);color:#fff}
+.beta-tag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;background:rgba(249,115,22,0.1);color:var(--accent);border:1px solid rgba(249,115,22,0.2)}
+.main{max-width:960px;margin:0 auto;padding:0 24px}
+.hero{padding:64px 0 48px;text-align:center}
+.hero h1{font-size:52px;font-weight:800;background:linear-gradient(135deg,#4F46E5,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px}
+.tagline{font-size:22px;font-weight:600;color:var(--text);margin-bottom:16px}
+.desc{font-size:16px;color:var(--text-light);max-width:540px;margin:0 auto;line-height:1.7}
+.section{padding:32px 0 48px}
+.section-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-light);margin-bottom:20px}
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:32px}
+.feature-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px 20px;transition:all .2s}
+.feature-card:hover{border-color:var(--primary);box-shadow:var(--shadow)}
+.feature-icon{font-size:28px;margin-bottom:12px}
+.feature-title{font-size:15px;font-weight:700;margin-bottom:6px;color:var(--text)}
+.feature-desc{font-size:13px;color:var(--text-light);line-height:1.6}
+/* ===== Pricing ===== */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:640px){.pricing-grid{grid-template-columns:1fr}}
+.pricing-card{background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);padding:28px 20px;text-align:center;display:flex;flex-direction:column;gap:0;position:relative;transition:all .2s}
+.pricing-card:hover{box-shadow:var(--shadow)}
+.pricing-card.featured{border-color:var(--primary);box-shadow:var(--shadow)}
+.badge{display:inline-block;background:var(--primary);color:#fff;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;position:absolute;top:-12px;left:50%;transform:translateX(-50%);white-space:nowrap}
+.plan-name{font-size:16px;font-weight:700;margin-bottom:10px;color:var(--text)}
+.plan-price{font-size:36px;font-weight:800;color:var(--primary);margin-bottom:4px;line-height:1}
+.plan-price span{font-size:14px;font-weight:500;color:var(--text-light)}
+.plan-detail{font-size:13px;color:var(--text-light);margin-bottom:20px;line-height:1.6;min-height:48px}
+.plan-features{list-style:none;margin-bottom:20px;text-align:left;flex:1}
+.plan-features li{font-size:13px;color:var(--text-light);padding:5px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.plan-features li:last-child{border-bottom:none}
+.plan-features li.disabled{color:#94A3B8;text-decoration:line-through;opacity:0.6}
+.plan-cta{display:inline-block;padding:10px 20px;background:var(--primary);color:#fff;border-radius:8px;font-size:14px;font-weight:600;transition:background .2s;margin-top:auto}
+.plan-cta:hover{background:var(--primary-dark)}
+.plan-cta.secondary{background:transparent;color:var(--text);border:1.5px solid var(--border)}
+.plan-cta.secondary:hover{border-color:var(--primary);color:var(--primary)}
+.footer{background:var(--surface);border-top:1px solid var(--border);padding:24px;text-align:center;margin-top:48px}
+.footer-links{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.footer-links a{color:var(--text-light);text-decoration:none;font-size:14px}
+.footer-links a:hover{color:var(--primary)}
+.footer-copy{font-size:13px;color:var(--text-light)}
+@media(max-width:640px){.features-grid,.pricing-grid{grid-template-columns:1fr}.hero h1{font-size:36px}.navbar{padding:0 16px}}
+</style>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RPNSC7KS1D"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-RPNSC7KS1D');
+</script>
+</head>
+<body>
+<nav class="navbar">
+  <a href="/" class="logo">DeAItify</a>
+  <ul class="nav-tabs">
+    <li><a href="/" class="nav-tab">Home</a></li>
+    <li><a href="/products.html" class="nav-tab active">Products</a></li>
+  </ul>
+  <span class="beta-tag">Beta</span>
+</nav>
+
+<main class="main">
+  <div class="hero">
+    <h1>DeAItify</h1>
+    <p class="tagline">Make AI-generated text sound human.</p>
+    <p class="desc">Bypass AI detection with natural rewriting. Transform AI-generated content into natural, human-like writing — essays, emails, articles, and more.</p>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Features</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">&#128220;</div>
+        <div class="feature-title">Academic Paper Humanizer</div>
+        <div class="feature-desc">Reduce AI detection scores in essays, theses, and academic manuscripts. Write with confidence.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#9998;</div>
+        <div class="feature-title">Multi-Style Rewriting</div>
+        <div class="feature-desc">Switch between formal, casual, and creative modes. Adapt your tone for any context or audience.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128161;</div>
+        <div class="feature-title">Prompt Deprompter</div>
+        <div class="feature-desc">Turn complex AI prompts into plain, natural language. Make AI output genuinely sound like you.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128270;</div>
+        <div class="feature-title">AI Content Detector</div>
+        <div class="feature-desc">Check if your text is flagged as AI-generated. Know before you submit.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-label">Pricing</div>
+    <div class="pricing-grid">
+
+      <!-- Free -->
+      <div class="pricing-card">
+        <div class="plan-name">Free</div>
+        <div class="plan-price">$0<span>/day</span></div>
+        <div class="plan-detail">No credit card required</div>
+        <ul class="plan-features">
+          <li>3 rewrites/day across all modes</li>
+          <li>Academic Paper optimization</li>
+          <li>General rewriting</li>
+          <li>Prompt deprompter</li>
+          <li class="disabled">AI Detection Score</li>
+        </ul>
+        <a href="/" class="plan-cta secondary">Start Free</a>
+      </div>
+
+      <!-- Pro Monthly -->
+      <div class="pricing-card featured">
+        <div class="badge">Most Popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-price">$9.99<span>/month</span></div>
+        <div class="plan-detail">Full access, cancel anytime</div>
+        <ul class="plan-features">
+          <li>100 paper rewrites/month (2,000 chars each)</li>
+          <li>Unlimited general rewriting</li>
+          <li>Unlimited prompt deprompter</li>
+          <li>200 AI Detection Scores/month</li>
+          <li>All writing styles unlocked</li>
+          <li>Priority support</li>
+        </ul>
+        <a href="/" class="plan-cta" onclick="return false;" style="opacity:0.6;cursor:not-allowed;">Coming Soon</a>
+        <div style="font-size:11px;color:var(--text-light);margin-top:8px;">(PayPal verification in progress)</div>
+      <div style="font-size:11px;color:#94A3B8;margin-top:10px;line-height:1.5;text-align:center">Non-refundable digital service. By purchasing, you agree to our <a href="/terms.html#refund-policy" style="color:#94A3B8;text-decoration:underline;">Refund Policy</a>.</div>
+      </div>
+
+      <!-- Pro Yearly -->
+      <div class="pricing-card">
+        <div class="plan-name">Pro Yearly</div>
+        <div class="plan-price">$79.99<span>/year</span></div>
+        <div class="plan-detail">$6.67/month — save 33%</div>
+        <ul class="plan-features">
+          <li>Everything in Pro</li>
+          <li>Early access to new features</li>
+          <li>Annual exclusive discount</li>
+        </ul>
+        <a href="/" class="plan-cta" onclick="return false;" style="opacity:0.6;cursor:not-allowed;">Coming Soon</a>
+        <div style="font-size:11px;color:var(--text-light);margin-top:8px;">(PayPal verification in progress)</div>
+      <div style="font-size:11px;color:#94A3B8;margin-top:10px;line-height:1.5;text-align:center">Non-refundable digital service. By purchasing, you agree to our <a href="/terms.html#refund-policy" style="color:#94A3B8;text-decoration:underline;">Refund Policy</a>.</div>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+<footer class="footer">
+  <div class="footer-links">
+    <a href="privacy.html">Privacy Policy</a>
+    <a href="terms.html">Terms of Service</a>
+    <a href="mailto:l15149134554@gmail.com">Contact</a>
+  </div>
+  <div class="footer-copy">&copy; 2025 DeAItify &middot; All processing is local &mdash; text never uploaded</div>
+</footer>
+</body>
+</html>
