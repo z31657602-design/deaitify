@@ -98,3 +98,15 @@ DeAItify now supports PayPal payments for Pro plans.
 - **Pro Yearly**: $79.99/year ($6.67/month)
 
 👉 Visit [laolang.fun/products](https://laolang.fun/products.html) to upgrade.
+
+
+---
+
+## Payments
+
+DeAItify now supports PayPal payments for Pro plans.
+
+- **Pro Monthly**: $9.99/month
+- **Pro Yearly**: $79.99/year ($6.67/month)
+
+👉 Visit [laolang.fun/products](https://laolang.fun/products.html) to upgrade.
