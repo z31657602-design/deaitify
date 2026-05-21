@@ -1,0 +1,7 @@
+title: DeAItify Blog
+description: "AI text humanizer - make AI text sound human"
+theme: minima
+markdown: kramdown
+github:
+  repository_url: https://github.com/z31657602-design/deaitify
+show_excerpts: true
